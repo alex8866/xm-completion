@@ -1,6 +1,9 @@
-#xm completion function
+#Xen xm command completion function
 function _xm()
 {
+    XENXM=${XENXM:="on"}
+    [ "$XENXM" == "off" ] && return 0
+
     local word=${COMP_WORDS[COMP_CWORD]}
     local line=${COMP_LINE}
     local comstr="console\ncreate\ndestroy\ndomid\ndomname\ndump-core\nlist\nmem-max\nmem-set\nmigrate\npause\nreboot\nrename\nrestore\nsave\nshutdown\nsysrq\ntrigger\ntop\nunpause\nuptime\nvcpu-list\nvcpu-pin\nvcpu-set\ndebug-keys\ndmesg\ninfo\nlog\nserve\nsched-credit\nsched-sedf\nblock-attach\nblock-detach\nblock-list\nblock-configure\nnetwork-attach\nnetwork-detach\nnetwork-list\nvtpm-list\npci-attach\npci-detach\npci-list\npci-list-assignable-devices\nvnet-list\nvnet-create\nvnet-delete\nlabels\naddlabel\nrmlabel\ngetlabel\ndry-run\nresources\nmakepolicy\nloadpolicy\ncfgbootpolicy\ndumppolicy"
@@ -12,7 +15,7 @@ function _xm()
         *create*)
             COMPREPLY=($(compgen -f -X "!*.cfg" -- "${word}"))
             ;;
-        *console*|*destroy*|*reboot*|*pause*|*unpause*|*shutdown*|*mem-max*|*mem-set*|*uptime*|*vcpu-list*|*vcpu-set*|*block-attach*|*block-detach*|*block-list*|*network-attach*|*network-detach*|*network-list*|*pci-attach*|*pci-detach*|*vcpu-pin*|*rename*|*domid*|*migrate*)
+        *console*|*destroy*|*reboot*|*pause*|*unpause*|*shutdown*|*mem-max*|*mem-set*|*uptime*|*vcpu-list*|*vcpu-set*|*block-attach*|*block-list*|*network-attach*|*network-list*|*pci-attach*|*vcpu-pin*|*rename*|*domid*|*migrate*|*save*)
             Wordlist2=$(xm list|sed '1,2d'|awk '{print $1}')
             COMPREPLY=($(compgen -W "$Wordlist2" -- "${word}"))
             ;;
@@ -36,6 +39,28 @@ function _xm()
             Wordlist2=$(xm list|sed '1,2d'|awk '{print $1}')
             COMPREPLY=($(compgen -W "$Wordlist2" -- "${word}"))
             ;;
+        *block-detach*)
+            [ $(echo "$line" | awk '{print NF}') -ge 3 ] && 
+            Wordlist2=$(eval xm block-list $(echo "$line" |awk '{print $3}') |
+            awk '$1!~/Vdev/{print $1}') ||
+            Wordlist2=$(xm list | sed '1,2d' | awk '{print $1}')
+            COMPREPLY=($(compgen -W "$Wordlist2" -- "${word}"))
+            ;;
+        *network-detach*)
+            [ $(echo "$line" | awk '{print NF}') -ge 3 ] && 
+            Wordlist2=$(eval xm network-list $(echo "$line" |awk '{print $3}') |
+            awk '$1!~/Idx/{print $1}') ||
+            Wordlist2=$(xm list | sed '1,2d' | awk '{print $1}')
+            COMPREPLY=($(compgen -W "$Wordlist2" -- "${word}"))
+            ;;
+        *pci-detach*)
+            [ $(echo "$line" | awk '{print NF}') -ge 3 ] && 
+            Wordlist2=$(eval xm pci-list $(echo "$line" |awk '{print $3}') |
+            awk '$1!~/VSlt/{print "0000:"$3":"$4"."$5}') ||
+            Wordlist2=$(xm list | sed '1,2d' | awk '{print $1}')
+            COMPREPLY=($(compgen -W "$Wordlist2" -- "${word}"))
+
+            ;;
         *domname*)
             Wordlist2=$(xm list | sed '1,2d' | awk '{print $2}')
             COMPREPLY=($(compgen -W "$Wordlist2" -- "${word}"))
@@ -43,14 +68,11 @@ function _xm()
         *dry-run*)
             COMPREPLY=($(compgen -f -X "!*.cfg" -- "${word}"))
             ;;
-        *restore*|*save*)
+        *restore*)
             COMPREPLY=($(compgen -f -- "${word}"))
             ;;
         *)
-            Wordlist=$(
-            ls *.cfg 2>/dev/null
-            echo -e "$comstr"
-            )
+            Wordlist=$(echo -e "$comstr")
             COMPREPLY=($(compgen -W "$Wordlist" -- "${word}"))
             ;;
     esac

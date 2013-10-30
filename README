@@ -1,2 +1,13 @@
-This is a Xen xm command completion script. You can append it to your .bashrc or profile, etc
+This is a Xen xm command completion script. You can append it to your .bashrc or profile, etc.
 to make it effect.
+
+
+If you prefer to use xm's original function, just type: export XENXM=off on your bash.
+
+
+I have another idea to speed the function _xm():
+Make a cache to store domain's detail information. Then when you <TAB> function _xm() will
+search info from the cache, not execute shell command to obtion the info. such as (hot plug
+device number)
+
+Feel free to make a contribution to it.
