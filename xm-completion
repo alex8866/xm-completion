@@ -15,7 +15,7 @@ function _xm()
         *create*)
             COMPREPLY=($(compgen -f -X "!*.cfg" -- "${word}"))
             ;;
-        *console*|*destroy*|*reboot*|*pause*|*unpause*|*shutdown*|*mem-max*|*mem-set*|*uptime*|*vcpu-list*|*vcpu-set*|*block-attach*|*block-list*|*network-attach*|*network-list*|*pci-attach*|*vcpu-pin*|*rename*|*domid*|*migrate*|*save*)
+        *console*|*destroy*|*reboot*|*pause*|*unpause*|*shutdown*|*mem-max*|*mem-set*|*uptime*|*vcpu-list*|*vcpu-set*|*block-attach*|*block-list*|*network-attach*|*network-list*|*pci-attach*|*vcpu-pin*|*rename*|*domid*|*migrate*|*save*|*dump-core*)
             Wordlist2=$(xm list|sed '1,2d'|awk '{print $1}')
             COMPREPLY=($(compgen -W "$Wordlist2" -- "${word}"))
             ;;
